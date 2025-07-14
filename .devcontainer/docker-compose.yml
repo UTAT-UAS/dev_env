@@ -1,0 +1,39 @@
+services:
+  uas:
+    image: uas/dev-environment:local
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+      tags:
+        - uas/dev-environment:local
+    hostname: ros-dev
+    extra_hosts:
+      - "localhost localhost.localdomain ros-dev:127.0.0.1"
+    container_name: uas-dev-container
+    stdin_open: true
+    tty: true
+    ipc: host
+    init: true
+    privileged: true
+    environment:
+      DISPLAY: $DISPLAY
+      XAUTHORITY: /home/${USER}/.Xauthority
+      QT_X11_NO_MITSHM: 1
+      QT_GRAPHICSSYSTEM: native
+    volumes:
+      - ../:/home/uas/workspace
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    command: /bin/bash
+    # network_mode: host
+    # gpus: all
+    deploy: # GPU pass through
+      resources:
+        reservations:
+          devices:
+            # - driver: nvidia
+            #   count: 1
+            #   capabilities: [gpu]
+            - driver: cdi
+              capabilities: [gpu]
+              device_ids:
+                - nvidia.com/gpu=all

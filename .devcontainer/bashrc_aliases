@@ -1,0 +1,32 @@
+# ROS utlity aliases
+alias rs='source ~/.bashrc' # re-source
+
+# vcs tool aliases
+
+alias vcsl='cd ~/workspace; vcs import < ./repos/latest.repos'
+alias vcsp='cd ~/workspace; vcs pull -n'
+alias vcst='cd ~/workspace; vcs custom -n --git --args fetch --tags --force'
+
+# Normal people aliases
+alias ls='ls --color=auto'
+alias lsa='ls -A'
+alias lsl='ls -lh --time-style="+%Y-%m-%d %H:%M:%S"'
+alias lsla='ls -lhA --time-style="+%Y-%m-%d %H:%M:%S"'
+
+alias grep='grep --color=auto'
+alias diff='diff --color=auto'
+alias mkdir='mkdir -pv'
+
+alias rm='rm -I --preserve-root'
+alias mv='mv -i'
+alias cp='cp -i'
+alias ln='ln -i'
+alias chown='chown --preserve-root'
+alias chmod='chmod --preserve-root'
+alias chgrp='chgrp --preserve-root'
+
+alias bd='cd "$OLDPWD"'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'

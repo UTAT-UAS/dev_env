@@ -1,0 +1,59 @@
+{
+	"name": "UAS PX4+ROS2 Workspace",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "uas",
+	"containerUser": "uas",
+	"workspaceFolder": "/home/uas/workspace",
+	"shutdownAction": "stopCompose",
+	"postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
+	"postCreateCommand": "bash .devcontainer/post-create.sh",
+	"forwardPorts": [
+		5000,
+		8080,
+		// 6080,
+		// 5901
+	],
+	"portsAttributes": {
+		"5000": {
+			"label": "Webviewer",
+			"onAutoForward": "silent"
+		},
+		"8080": {
+			"label": "Rosbridge",
+			"onAutoForward": "silent"
+		},
+		// "6080":{
+		// 	"label": "Desktop Web",
+		// 	"onAutoForward": "silent"
+		// },
+		// "5901":{
+		// 	"label": "Desktop VNC",
+		// 	"onAutoForward": "silent"
+		// }
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-vscode.cpptools",
+				"ms-vscode.cmake-tools",
+				"mutantdino.resourcemonitor",
+				"ms-azuretools.vscode-docker",
+				"ms-python.python",
+				"charliermarsh.ruff",
+				"ms-vscode.cpptools-extension-pack",
+				"streetsidesoftware.code-spell-checker",
+				"ms-python.pylint",
+				"njpwerner.autodocstring",
+				// "ms-python.mypy-type-checker",
+				"eamodio.gitlens",
+				// "svelte.svelte-vscode"
+			]
+		}
+	},
+	// "features": {
+	// 	"ghcr.io/devcontainers/features/desktop-lite:1": {
+	// 		"password": "noPassword"
+	// 	}
+	// }
+    "mounts": ["type=bind,source=/dev/bus/usb,target=/dev/bus/usb"]
+}

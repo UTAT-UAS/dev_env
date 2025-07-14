@@ -1,0 +1,9 @@
+repositories:
+  ../workspace:
+    type: git
+    url: TODO
+    version: main
+  uas_ws/src/TODO:
+    type: git
+    url: TODO
+    version: main

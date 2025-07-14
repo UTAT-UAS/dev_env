@@ -1,0 +1,19 @@
+{
+    "cmake.ignoreCMakeListsMissing": true,
+    "git.repositoryScanMaxDepth": 3,
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+    },
+    "python.analysis.extraPaths": [
+    ],
+    "autoDocstring.docstringFormat": "google",
+    "cSpell.words": [
+        "roscore",
+        "rosgraph",
+        "rosparam",
+        "rospy",
+        "mavros",
+        "offboard"
+    ],
+    "cSpell.diagnosticLevel": "Hint"
+}
