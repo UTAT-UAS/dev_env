@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Custom SDL config
+sudo echo "#!/usr/bin/env bash" >> /usr/bin/qgc
+sudo echo "SDL_GAMECONTROLLERCONFIG="0300000009120000544f000011010000,OpenTX Radiomaster Pocket Joystick,a:b0,b:b1,x:b3,y:b4,back:b10,guide:b12,start:b11,leftstick:b13,rightstick:b14,leftshoulder:b6,rightshoulder:b7,leftx:a0,lefty:a1,rightx:a3,righty:a2,lefttrigger:a4,righttrigger:a5,platform:Linux" /QGroundControl-x86_64.AppImage --appimage-extract-and-run" >> /usr/bin/qgc
+
 # Personal aliases
 echo "set -o vi
 alias svi='sudo vim'

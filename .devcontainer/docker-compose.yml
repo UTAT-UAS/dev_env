@@ -25,15 +25,11 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
     command: /bin/bash
     # network_mode: host
-    # gpus: all
-    deploy: # GPU pass through
-      resources:
-        reservations:
-          devices:
-            # - driver: nvidia
-            #   count: 1
-            #   capabilities: [gpu]
-            - driver: cdi
-              capabilities: [gpu]
-              device_ids:
-                - nvidia.com/gpu=all
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: cdi
+    #           capabilities: [gpu]
+    #           device_ids:
+    #             - nvidia.com/gpu=all

@@ -27,7 +27,10 @@ RUN apt -y install --no-install-recommends \
     python3 python3-dev python3-pip \
     git wget vim nano curl bzip2 tree less man-db \
     gnupg2 ca-certificates sudo \
-    htop bmon iotop neofetch\
+    htop bmon iotop neofetch tmux \
+    bash-completion \
+    iputils-ping net-tools usbutils \
+    python3-vcstool \
     && apt autoremove -y \
     && apt clean -y
 
@@ -89,20 +92,9 @@ RUN apt-get install -y --no-install-recommends \
     ros-${ROS_DISTRO}-mavros-extras \
     ros-${ROS_DISTRO}-mavros-msgs
 
-# This stopped working on 2025-01-07 on my machine, some sort of TLS issue or something, do manual install as workaround
+# geographiclib datsets installation
 RUN wget https://raw.githubusercontent.com/mavlink/mavros/ros2/mavros/scripts/install_geographiclib_datasets.sh && \
     bash ./install_geographiclib_datasets.sh
-
-# Manual geographiclib datsets installation
-# RUN wget -O egm96.tar.bz2 http://downloads.sourceforge.net/project/geographiclib/gravity-distrib/egm96.tar.bz2?use_mirror=autoselect && \
-#     wget -O egm96-5.tar.bz2 http://downloads.sourceforge.net/project/geographiclib/geoids-distrib/egm96-5.tar.bz2?use_mirror=autoselect && \
-#     wget -O emm2015.tar.bz2 http://downloads.sourceforge.net/project/geographiclib/magnetic-distrib/emm2015.tar.bz2?use_mirror=autoselect && \
-#     tar -xvjf egm96.tar.bz2 && \
-#     tar -xvjf egm96-5.tar.bz2 && \
-#     tar -xvjf emm2015.tar.bz2 && \
-#     sudo cp -r geoids /usr/share/GeographicLib && \
-#     sudo cp -r gravity/ /usr/share/GeographicLib && \
-#     sudo cp -r magnetic/ /usr/share/GeographicLib
 
 # Computer vision python packages
 
@@ -114,38 +106,22 @@ RUN wget https://raw.githubusercontent.com/mavlink/mavros/ros2/mavros/scripts/in
 # CUDA: No
 # ROCm: No
 
-# Install old networkx first
-# RUN python3 -m pip install \
-#     networkx==3.0
-
 RUN python3 -m pip install \
     torch torchvision torchaudio \
-    # --index-url https://download.pytorch.org/whl/cpu
-    --index-url https://download.pytorch.org/whl/cu128
+    --index-url https://download.pytorch.org/whl/cpu
+    # --index-url https://download.pytorch.org/whl/cu128
     # --index-urlhttps://download.pytorch.org/whl/rocm6.3
 
 # ultralytics needs requests but is not a pip dependency for some reason
 RUN python3 -m pip install \
     opencv-python \
     ultralytics
-#     requests
-
-# For the drone-visualization webviewer (vite needs node v18 as minimum)
-# RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && \
-#     apt-get install -y --no-install-recommends nodejs
 
 # Place new packages here or ones not needed in any build dependencies
 # RUN apt-get install -y --no-install-recommends \
-#     python3-vcstool \
 #     x11-apps \
 #     dos2unix \
 #     graphviz \
-#     ros-${ROS_DISTRO}-rosbridge-server \
-#     python3-lxml \
-#     bash-completion \
-#     iputils-ping \
-#     net-tools \
-#     tmux
 # RUN python3 -m pip install --ignore-installed \
 #     colorama \
 #     pydot \
@@ -155,10 +131,6 @@ RUN python3 -m pip install \
 #     flask-socketio \
 #     flask_cors \
 #     pykml
-
-# Install requests again because it doesn't get installed to user when installed earlier for some reason
-# RUN python3 -m pip install \
-#     requests
 
 USER $USERNAME
 

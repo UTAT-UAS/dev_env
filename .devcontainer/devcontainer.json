@@ -55,5 +55,6 @@
 	// 		"password": "noPassword"
 	// 	}
 	// }
-    "mounts": ["type=bind,source=/dev/bus/usb,target=/dev/bus/usb"]
+	// Enable dev bind for controller support, must be plugged in before container start
+    // "mounts": ["type=bind,source=/dev,target=/dev"]
 }

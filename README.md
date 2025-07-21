@@ -7,7 +7,7 @@ A batteries-included opinionated environment for UAS Multirotor ROS2 project dev
 - Includes ROS2 and PX4 and required development dependencies
 - QGroundControl bundled in the system path with `qgc`
 
-TODO: WIKI LINK
+[See here for the full walkthrough](https://utat-uas.github.io/wiki/Multirotor/Tutorials/)
 
 ## Repository Layout
 
@@ -155,7 +155,7 @@ The container is based on `Ubuntu 22.04.5 LTS`, the `uas` user is configured wit
 sudo apt update
 # Install more software e.g. btop
 sudo apt install btop
-# Use pip (as sudo) to install more python modules
+# Use pip (as sudo unless using venv) to install more python modules
 sudo pip install pyjokes
 ```
 
