@@ -39,15 +39,18 @@ RUN ln -sv /usr/bin/python3 /usr/bin/python
 
 # Install core python packages
 RUN python3 -m pip install \
-    numpy==2.2.6 \
-    scipy==1.8.0 \
-    pillow==9.0.1 \
-    pandas==2.3.1 \
-    matplotlib==3.5.1 \
-    seaborn==0.13.2 \
+    numpy \
+    scipy \
+    pillow \
+    pandas \
+    matplotlib \
+    seaborn
+
+# Install python packages needed for PX4, setuptool==64.0.4 required for px4_msgs to build
+RUN python3 -m pip install \
     empy==3.3.4 \
     pyros-genmsg==0.5.8 \
-    setuptools==59.6.0
+    setuptools==64.0.3
 
 # Install QGC and link to PATH
 # Allows QGC to work without network_mode=host
@@ -55,8 +58,7 @@ RUN usermod -a -G dialout $USERNAME
 RUN apt-get remove modemmanager -y
 RUN apt -y install --no-install-recommends \
     gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-gl \
-    libfuse2 \
-    libxcb-xinerama0 libxkbcommon-x11-0 libxcb-cursor-dev \
+    libfuse2 libxcb-xinerama0 libxkbcommon-x11-0 libxcb-cursor-dev \
     pipewire libspeechd2
 RUN wget https://github.com/mavlink/qgroundcontrol/releases/download/v5.0.6/QGroundControl-x86_64.AppImage
 # Custom launch script to launch appimages in containers
@@ -70,17 +72,22 @@ USER $USERNAME
 WORKDIR /home/$USERNAME
 
 # Install PX4
-RUN git clone --branch v1.15.4 --depth 1 https://github.com/PX4/PX4-Autopilot.git && \
+RUN git clone --branch v1.16.0 https://github.com/PX4/PX4-Autopilot.git --recursive && \
+    bash ./PX4-Autopilot/Tools/setup/ubuntu.sh && \
     cd PX4-Autopilot && \
-    git checkout v1.15.4 && \
-    make submodulesclean
-
-RUN bash ./PX4-Autopilot/Tools/setup/ubuntu.sh
-
-# Build gazebo
-RUN cd ~/PX4-Autopilot && \
-    make distclean && \
     DONT_RUN=1 make px4_sitl
+
+# Install uXRCE-DDS agent and client
+# Requires teh `sed` command to fix: https://github.com/eProsima/Micro-XRCE-DDS-Agent/issues/370
+RUN git clone --branch v2.4.2 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git && \
+    cd Micro-XRCE-DDS-Agent && \
+    sed -i 's/_fastdds_tag 2\.12\.x/_fastdds_tag v2\.12\.2/' CMakeLists.txt && \
+    mkdir build && \
+    cd build && \
+    cmake .. && \
+    make -j && \
+    sudo make install && \
+    sudo ldconfig /usr/local/lib/
 
 # Back to root
 USER root
@@ -96,32 +103,26 @@ RUN apt-get install -y --no-install-recommends \
 RUN wget https://raw.githubusercontent.com/mavlink/mavros/ros2/mavros/scripts/install_geographiclib_datasets.sh && \
     bash ./install_geographiclib_datasets.sh
 
-# Computer vision python packages
+# Computer vision Python packages
 
 # https://pytorch.org/get-started/locally/
-# Change (or remove) --index-url to use a different compute platform, the GPU versions take a lot more space ~4GB
+# Change (or remove) --index-url to use a different compute platform (make sure to use the correct cu/rocm version for you GPU)
+# Note that the GPU versions take a lot more space ~4GB
 # You will also have to enable gpu in docker-compose.yml (and have drivers on host machine)
-# Platforms successfully tested:
-# CPU:  Yes
-# CUDA: No
-# ROCm: No
 
 RUN python3 -m pip install \
     torch torchvision torchaudio \
     --index-url https://download.pytorch.org/whl/cpu
     # --index-url https://download.pytorch.org/whl/cu128
-    # --index-urlhttps://download.pytorch.org/whl/rocm6.3
-
-# ultralytics needs requests but is not a pip dependency for some reason
+    # --index-url https://download.pytorch.org/whl/rocm6.3
 RUN python3 -m pip install \
     opencv-python \
     ultralytics
 
 # Place new packages here or ones not needed in any build dependencies
-# RUN apt-get install -y --no-install-recommends \
-#     x11-apps \
-#     dos2unix \
-#     graphviz \
+RUN apt-get install -y --no-install-recommends \
+    x11-apps \
+    dos2unix
 # RUN python3 -m pip install --ignore-installed \
 #     colorama \
 #     pydot \

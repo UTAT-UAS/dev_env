@@ -1,4 +1,4 @@
-# ROS utlity aliases
+# ROS utility aliases
 alias rs='source ~/.bashrc' # re-source
 
 # vcs tool aliases

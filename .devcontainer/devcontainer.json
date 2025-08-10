@@ -1,5 +1,5 @@
 {
-	"name": "UAS PX4+ROS2 Workspace",
+	"name": "UAS PX4+ROS2",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "uas",
 	"containerUser": "uas",

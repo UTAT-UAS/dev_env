@@ -1,10 +1,10 @@
 # Dev Env
 
-A batteries-included opinionated environment for UAS Multirotor ROS2 project development.
+A batteries-included opinionated environment for UAS Multirotor PX4/ROS2 project development.
 
 ## Features
 
-- Includes ROS2 and PX4 and required development dependencies
+- Includes ROS2 Humble, PX4 16.0 and required development tools/dependencies
 - QGroundControl bundled in the system path with `qgc`
 
 [See here for the full walkthrough](https://utat-uas.github.io/wiki/Multirotor/Tutorials/)
@@ -24,17 +24,18 @@ A batteries-included opinionated environment for UAS Multirotor ROS2 project dev
 ## Getting Started
 
 OS Support:
-- Linux (x86_64): Working, any distro, optimal, beautiful, perfect.
-- Linux (ARM): untested
-- Windows (x86_64): untested (potential GPU passthrough problems)
-- Windows (ARM): untested
-- Mac (ARM): untested (highly doubt)
-- FreeBSD: untested
-- Linux (RISC-V): untested
+- [x] **Linux (x86_64)**: Working, any distro, optimal, beautiful, perfect.
+- [x] **Windows (x86_64)**: Working*, Gazebo seems unable to use the GPU however
+- [ ] MacOS: untested (highly doubt)
+- [ ] Windows (ARM): untested
+- [ ] Linux (ARM): untested
+- [ ] FreeBSD: untested
+- [ ] Linux (RISC-V): untested
 
 Recommended at least ~15GB of free space (more is better).
 - Container is about ~12GB (it takes a lot of packages to run this stuff).
 - Extra 3GB for the container storage, files, caching, logs, etc.
+- With GPU accelerated PyTorch ~25GB of free space is required
 
 Assuming you have Docker and VSCode already installed. (For Windows Docker should be installed via WSL in order for X11 apps to work) (For Linux rootless Docker will not work as the workspace ownership will be weird)
 
@@ -161,10 +162,10 @@ sudo pip install pyjokes
 
 ### Network Mode Host and QGroundControl
 
-QGroundControl is bundled with the container and will work with 
+QGroundControl is bundled with the container and will work with the PX4/Gazebo simulation. Simply run `qgc`.
 
-But if you wanted to allow QGroundControl running natively on the host sytem to connect to the simulation, goto `.devcontainer/docker-compose.yml` and uncomment `network_mode: host`, you should also comment out `forwardPorts` in `.devcontainer/devcontainer.json` to fix some behavioral issues. Rebuild the container.
+But if you wanted to allow QGroundControl running natively on the host system to connect to the simulation, goto `.devcontainer/docker-compose.yml` and uncomment `network_mode: host`, you should also comment out `forwardPorts` in `.devcontainer/devcontainer.json` to fix some behavioral issues. Rebuild the container.
 
 After rebuild make sure that no ports are forwarded from the devcontainer, by default the `ports` tab is on the same panel as the terminal. Select any open ports and right click `stop forwarding`. (this is the behavior for Linux, other operating systems may be different)
 
-Note that `network_mode: host` will make it more likely that other issues will occur.
+Note that `network_mode: host` will make it more likely that other issues will occur. You may get firewall issues which will prevent ROS2 from running.
