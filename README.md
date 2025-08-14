@@ -4,7 +4,7 @@ A batteries-included opinionated environment for UAS Multirotor PX4/ROS2 project
 
 ## Features
 
-- Includes ROS2 Humble, PX4 16.0 and required development tools/dependencies
+- Includes ROS2 Humble, PX4 16.0, uXRCE-DDS, and other development tools/dependencies
 - QGroundControl bundled in the system path with `qgc`
 
 [See here for the full walkthrough](https://utat-uas.github.io/wiki/Multirotor/Tutorials/)
@@ -15,11 +15,13 @@ A batteries-included opinionated environment for UAS Multirotor PX4/ROS2 project
 .                   // Mounted to /home/uas/workspace in container
 ├── .devcontainer/  // Container configuration + setup
 ├── .vscode/        // VSCode configuration
-├── uas_ws/         // ROS2 workspace
-│   └── src/        // ROS2 packages
-│       └── ...
-└── repos/          // Repository lists for vcstool
+├── repos/          // Repository lists for vcstool
+└── uas_ws/         // ROS2 workspace
+    └── src/        // ROS2 packages
+        └── ...
 ```
+
+The PX4 repository is cloned to `/home/uas`
 
 ## Getting Started
 
@@ -46,12 +48,13 @@ See [Virtual Desktop](#virtual-desktop) for enabling a browser accessible deskto
 3. You should be prompted by a pop-up in the bottom right to open this folder in a container.
     - If not, open command palette `ctrl+shift+p` and search for `Dev Containers: Open Folder in Container`.
 4. VScode should begin building the container
+    - On a fast PC with fast internet this takes about 15 minutes
 5. For version control GitHub via `SSH` is required: [GitHub docs](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
 6. Enable `ssh-agent` [passthrough](https://code.visualstudio.com/remote/advancedcontainers/sharing-git-credentials) for devcontainers.
 7. From `/home/uas/workspace` Run `vcs import < ./repos/latest.repos`
     - If new repositories do not appear in VScode source control, from command palette run `Developer: Reload Window` to refresh.
     - If new repositories are still not visible on the source control tab click the `...` then `View & Sort` > `repositories` and check the ones you want to see. Alternatively under `Views` enable `Source Control Repositories` for an alternate layout.
-8. `cd uas_ws` and run `TODO`.
+8. Once in the container run `cd uas_ws` and run `colcon build`.
 9. Read each repositories `README.md` for more information on working with them.
 
 ## vcstool
@@ -145,9 +148,7 @@ Adding VSCode extensions can be done via:
 
 https://code.visualstudio.com/docs/devcontainers/containers#_always-installed-extensions
 
-## FAQ and Common Problems
-
-### Installing more software in the container
+## Installing more software in the container
 
 The container is based on `Ubuntu 22.04.5 LTS`, the `uas` user is configured with passwordless `sudo`.
 
@@ -160,11 +161,13 @@ sudo apt install btop
 sudo pip install pyjokes
 ```
 
-### Network Mode Host and QGroundControl
+## QGroundControl
 
 QGroundControl is bundled with the container and will work with the PX4/Gazebo simulation. Simply run `qgc`.
 
-But if you wanted to allow QGroundControl running natively on the host system to connect to the simulation, goto `.devcontainer/docker-compose.yml` and uncomment `network_mode: host`, you should also comment out `forwardPorts` in `.devcontainer/devcontainer.json` to fix some behavioral issues. Rebuild the container.
+Enable usb joystick by uncommenting the `mounts` option in `.devcontainer/devcontainer.json`.
+
+If you want to allow an instance of QGroundControl running natively on the host system to connect to the simulation, goto `.devcontainer/docker-compose.yml` and uncomment `network_mode: host`, you should also comment out `forwardPorts` in `.devcontainer/devcontainer.json` to fix some behavioral issues. Rebuild the container.
 
 After rebuild make sure that no ports are forwarded from the devcontainer, by default the `ports` tab is on the same panel as the terminal. Select any open ports and right click `stop forwarding`. (this is the behavior for Linux, other operating systems may be different)
 
