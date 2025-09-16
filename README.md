@@ -5,6 +5,7 @@ A batteries-included opinionated environment for UAS Multirotor PX4/ROS2 project
 ## Features
 
 - Includes ROS2 Humble, PX4 16.0, uXRCE-DDS, and other development tools/dependencies
+- VSCode configuration pre-configured (generic editor documentation coming soon)
 - QGroundControl bundled in the system path with `qgc`
 
 [See here for the full walkthrough](https://utat-uas.github.io/wiki/Multirotor/Tutorials/)
@@ -27,12 +28,14 @@ The PX4 repository is cloned to `/home/uas`
 
 OS Support:
 - [x] **Linux (x86_64)**: Working, any distro, optimal, beautiful, perfect.
-- [x] **Windows (x86_64)**: Working*, Gazebo seems unable to use the GPU however
-- [ ] MacOS: untested (highly doubt)
+- [x] **Windows (x86_64)**: Working*
+- [ ] MacOS: Non-working (Gazebo does not work)
 - [ ] Windows (ARM): untested
 - [ ] Linux (ARM): untested
 - [ ] FreeBSD: untested
 - [ ] Linux (RISC-V): untested
+
+*Gazebo seems unable to use integrated GPUs however, and dedicated GPU setup has not been tested
 
 Recommended at least ~15GB of free space (more is better).
 - Container is about ~12GB (it takes a lot of packages to run this stuff).
@@ -49,13 +52,15 @@ See [Virtual Desktop](#virtual-desktop) for enabling a browser accessible deskto
     - If not, open command palette `ctrl+shift+p` and search for `Dev Containers: Open Folder in Container`.
 4. VScode should begin building the container
     - On a fast PC with fast internet this takes about 15 minutes
-5. For version control GitHub via `SSH` is required: [GitHub docs](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
-6. Enable `ssh-agent` [passthrough](https://code.visualstudio.com/remote/advancedcontainers/sharing-git-credentials) for devcontainers.
-7. From `/home/uas/workspace` Run `vcs import < ./repos/latest.repos`
+    - On a slow PC with slow internet this could take 30++ minutes
+5. Test that your setup works by running the `sim` command
+6. For version control GitHub via `SSH` is required: [GitHub docs](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+7. Enable `ssh-agent` [passthrough](https://code.visualstudio.com/remote/advancedcontainers/sharing-git-credentials) for devcontainers.
+8. From `/home/uas/workspace` Run `vcs import < ./repos/latest.repos`
     - If new repositories do not appear in VScode source control, from command palette run `Developer: Reload Window` to refresh.
     - If new repositories are still not visible on the source control tab click the `...` then `View & Sort` > `repositories` and check the ones you want to see. Alternatively under `Views` enable `Source Control Repositories` for an alternate layout.
-8. Once in the container run `cd uas_ws` and run `colcon build`.
-9. Read each repositories `README.md` for more information on working with them.
+9. Once in the container run `cd uas_ws` and run `colcon build`.
+10. Read each repositories `README.md` for more information on working with them.
 
 ## vcstool
 
@@ -165,7 +170,15 @@ sudo pip install pyjokes
 
 QGroundControl is bundled with the container and will work with the PX4/Gazebo simulation. Simply run `qgc`.
 
-Enable usb joystick by uncommenting the `mounts` option in `.devcontainer/devcontainer.json`.
+### Joystick
+
+Enable usb joystick by uncommenting the `/dev/input:/dev/input` volume in `.devcontainer/docker-compose.yml` (security note: this passes through all of your input devices to the container). Depending on your joystick you may need [https://github.com/sezanzeb/input-remapper/tree/main?tab=readme-ov-file](https://github.com/sezanzeb/input-remapper/tree/main?tab=readme-ov-file), or edit and export the `SDL_GAMECONTROLLERCONFIG` environment variable. See `./profiles` for examples.
+
+In QGroundControl on the Vehicle Configuration page the Joystick option should be visible, enable joystick input, calibrate if necessary and assign button actions.
+
+Depending on the simulation/Docker/OS/hardware you will get communication loss errors from QGroundControl, set `COM_RC_LOSS_T` to some large number like 5 seconds, probably don't do this on a real drone but for simulation its fine.
+
+### Configuration
 
 If you want to allow an instance of QGroundControl running natively on the host system to connect to the simulation, goto `.devcontainer/docker-compose.yml` and uncomment `network_mode: host`, you should also comment out `forwardPorts` in `.devcontainer/devcontainer.json` to fix some behavioral issues. Rebuild the container.
 
