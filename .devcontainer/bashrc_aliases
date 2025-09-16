@@ -1,8 +1,9 @@
-# ROS utility aliases
+# Utility aliases
 alias rs='source ~/.bashrc' # re-source
+alias sim='cd ~/PX4-Autopilot && make px4_sitl gz_x500'
+alias uxrce='MicroXRCEAgent udp4 -p 8888'
 
 # vcs tool aliases
-
 alias vcsl='cd ~/workspace; vcs import < ./repos/latest.repos'
 alias vcsp='cd ~/workspace; vcs pull -n'
 alias vcst='cd ~/workspace; vcs custom -n --git --args fetch --tags --force'

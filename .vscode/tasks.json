@@ -1,0 +1,49 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "px4_sitl",
+            "type": "shell",
+            "command": "cd ~/PX4-Autopilot && make px4_sitl gz_x500",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "group": "simulation"
+            },
+            "hide": true
+        },
+        {
+            "label": "uXRCE",
+            "type": "shell",
+            "command": "MicroXRCEAgent udp4 -p 8888",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "group": "simulation"
+            },
+            "hide": true
+        },
+        {
+            "label": "QGC",
+            "type": "shell",
+            "command": "qgc",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "group": "simulation"
+            },
+            "hide": true
+        },
+        {
+            "label": "Launch Simulator",
+            "dependsOn": [
+                "px4_sitl",
+                "uXRCE",
+                "QGC"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}
