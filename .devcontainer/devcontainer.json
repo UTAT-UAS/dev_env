@@ -55,6 +55,4 @@
 	// 		"password": "noPassword"
 	// 	}
 	// }
-	// Enable dev bind for controller support, must be plugged in before container start
-    // "mounts": ["type=bind,source=/dev,target=/dev"]
 }

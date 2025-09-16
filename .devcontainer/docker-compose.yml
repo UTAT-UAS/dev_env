@@ -23,6 +23,7 @@ services:
     volumes:
       - ../:/home/uas/workspace
       - /tmp/.X11-unix:/tmp/.X11-unix
+      # - /dev/input:/dev/input
     command: /bin/bash
     # network_mode: host
     # deploy:
