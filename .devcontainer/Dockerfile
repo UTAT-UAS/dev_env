@@ -78,14 +78,14 @@ RUN git clone --branch v1.16.0 https://github.com/PX4/PX4-Autopilot.git --recurs
     DONT_RUN=1 make px4_sitl
 
 # Install uXRCE-DDS agent and client
-# Requires teh `sed` command to fix: https://github.com/eProsima/Micro-XRCE-DDS-Agent/issues/370
+# Requires the `sed` command to fix: https://github.com/eProsima/Micro-XRCE-DDS-Agent/issues/370
 RUN git clone --branch v2.4.2 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git && \
     cd Micro-XRCE-DDS-Agent && \
     sed -i 's/_fastdds_tag 2\.12\.x/_fastdds_tag v2\.12\.2/' CMakeLists.txt && \
     mkdir build && \
     cd build && \
     cmake .. && \
-    make -j && \
+    make -j 10 && \
     sudo make install && \
     sudo ldconfig /usr/local/lib/
 
