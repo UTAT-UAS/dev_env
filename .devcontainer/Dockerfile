@@ -1,4 +1,4 @@
-FROM osrf/ros:humble-desktop-full
+FROM osrf/ros:humble-desktop-full@sha256:ddfee4353aa16235a8f87b00815d9f8c611cf42f1fb6a90e113e573bc466f9f1
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG PIP_NO_CACHE_DIR=1
