@@ -6,6 +6,10 @@
 
 cat .devcontainer/bashrc_aliases >> ~/.bashrc
 
+## Create the colcon workspace directory
+
+mkdir -p uas_ws/src
+
 ## Create custom setup script in .devcontainer/profiles
 ## Then create .user file in .devcontainer with only the name of the script in it
 
