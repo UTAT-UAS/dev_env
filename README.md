@@ -92,7 +92,7 @@ vcs custom -n --git --args fetch --tags --force # vcst
 
 ## GPU
 
-A GPU is highly recommend to Computer Vision tasks. It is also nice to have for Gazebo otherwise you will get around 12 fps (although the RTF factor seems fine).
+A GPU is highly recommend for Computer Vision tasks. It is also nice to have for Gazebo otherwise you will get around 12 fps (although the RTF factor seems fine).
 
 Setup will vary widely between OS and hardware configurations, it is likely best you consult external sources for your specific configuration.
 
@@ -126,7 +126,9 @@ TODO DOCUMENTATION NEEDED
 
 ### iGPU
 
-TODO DOCUMENTATION NEEDED
+Linux: If it works on the host it should just work
+
+Windows/WSL2: Seems to be unsupported for Gazebo
 
 ## Virtual Desktop
 
@@ -162,7 +164,7 @@ The container is based on `Ubuntu 22.04.5 LTS`, the `uas` user is configured wit
 sudo apt update
 # Install more software e.g. btop
 sudo apt install btop
-# Use pip (as sudo unless using venv) to install more python modules
+# Use pip (as sudo unless using venv) to install more python modules (only if necessary)
 sudo pip install pyjokes
 ```
 
