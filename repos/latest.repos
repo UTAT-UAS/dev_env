@@ -1,9 +1,21 @@
 repositories:
   ../workspace:
     type: git
-    url: TODO
+    url: git@github.com:UTAT-UAS/dev_env.git
     version: main
-  uas_ws/src/TODO:
+  uas_ws/src/flight_stack:
     type: git
-    url: TODO
+    url: git@github.com:UTAT-UAS/flight_stack.git
     version: main
+  uas_ws/src/flight_stack_msgs:
+    type: git
+    url: git@github.com:UTAT-UAS/flight_stack_msgs.git
+    version: main
+  uas_ws/src/computer_vision:
+    type: git
+    url: git@github.com:UTAT-UAS/computer_vision.git
+    version: main
+  uas_ws/src/px4_msgs:
+    type: git
+    url: https://github.com/PX4/px4_msgs.git
+    version: release/1.16

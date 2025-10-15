@@ -59,7 +59,7 @@ See [Virtual Desktop](#virtual-desktop) for enabling a browser accessible deskto
 8. From `/home/uas/workspace` Run `vcs import < ./repos/latest.repos`
     - If new repositories do not appear in VScode source control, from command palette run `Developer: Reload Window` to refresh.
     - If new repositories are still not visible on the source control tab click the `...` then `View & Sort` > `repositories` and check the ones you want to see. Alternatively under `Views` enable `Source Control Repositories` for an alternate layout.
-9. Once in the container run `cd uas_ws` and run `colcon build`.
+9. Once in the container run `cd uas_ws` and run `colcon build --symlink-install`.
 10. Read each repositories `README.md` for more information on working with them.
 
 ## vcstool
@@ -92,7 +92,7 @@ vcs custom -n --git --args fetch --tags --force # vcst
 
 ## GPU
 
-A GPU is highly recommend to Computer Vision tasks. It is also nice to have for Gazebo otherwise you will get around 12 fps (although the RTF factor seems fine).
+A GPU is highly recommend for Computer Vision tasks. It is also nice to have for Gazebo otherwise you will get around 12 fps (although the RTF factor seems fine).
 
 Setup will vary widely between OS and hardware configurations, it is likely best you consult external sources for your specific configuration.
 
@@ -126,7 +126,9 @@ TODO DOCUMENTATION NEEDED
 
 ### iGPU
 
-TODO DOCUMENTATION NEEDED
+Linux: If it works on the host it should just work
+
+Windows/WSL2: Seems to be unsupported for Gazebo
 
 ## Virtual Desktop
 
@@ -162,7 +164,7 @@ The container is based on `Ubuntu 22.04.5 LTS`, the `uas` user is configured wit
 sudo apt update
 # Install more software e.g. btop
 sudo apt install btop
-# Use pip (as sudo unless using venv) to install more python modules
+# Use pip (as sudo unless using venv) to install more python modules (only if necessary)
 sudo pip install pyjokes
 ```
 

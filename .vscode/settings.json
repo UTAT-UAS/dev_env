@@ -5,6 +5,11 @@
         "editor.defaultFormatter": "charliermarsh.ruff",
     },
     "python.analysis.extraPaths": [
+        "~/workspace/uas_ws/src/flight_stack",
+        "~/workspace/uas_ws/src/computer_vision",
+    ],
+    "pylint.args": [
+        "--generated-members=cv2.*"
     ],
     "autoDocstring.docstringFormat": "google",
     "cSpell.words": [

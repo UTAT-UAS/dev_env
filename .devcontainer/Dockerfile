@@ -38,19 +38,19 @@ RUN apt -y install --no-install-recommends \
 RUN ln -sv /usr/bin/python3 /usr/bin/python
 
 # Install core python packages
-RUN python3 -m pip install \
-    numpy \
-    scipy \
-    pillow \
-    pandas \
-    matplotlib \
-    seaborn
+RUN apt -y install \
+    python3-numpy \
+    python3-scipy \
+    python3-pillow \
+    python3-pandas \
+    python3-matplotlib \
+    python3-seaborn
 
-# Install python packages needed for PX4, setuptool==64.0.4 required for px4_msgs to build
-RUN python3 -m pip install \
-    empy==3.3.4 \
-    pyros-genmsg==0.5.8 \
-    setuptools==64.0.3
+# Install PX4 and ROS python packages
+RUN apt -y install \
+    python3-empy \
+    python3-genpy \
+    python3-setuptools
 
 # Install QGC and link to PATH
 # Allows QGC to work without network_mode=host
@@ -85,9 +85,38 @@ RUN git clone --branch v2.4.2 https://github.com/eProsima/Micro-XRCE-DDS-Agent.g
     mkdir build && \
     cd build && \
     cmake .. && \
-    make -j 10 && \
+    make -j$(nproc) && \
     sudo make install && \
     sudo ldconfig /usr/local/lib/
+
+# Build OpenCV with gstreamer support (needed for gazebo camera plugin video capture)
+# https://medium.com/@erencanbulut/step-by-step-build-opencv-with-gstreamer-on-jetson-orin-nano-ubuntu-22-04-08edfb373c78
+RUN sudo apt install -y \
+    build-essential cmake git pkg-config \
+    libjpeg-dev libtiff-dev libpng-dev \
+    libavcodec-dev libavformat-dev libswscale-dev \
+    libv4l-dev libxvidcore-dev libx264-dev \
+    libgtk-3-dev libatlas-base-dev gfortran \
+    python3-dev python3-numpy \
+    libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+RUN git clone --branch 4.12.0 --depth 1 https://github.com/opencv/opencv.git && \
+    git clone --branch 4.12.0 --depth 1 https://github.com/opencv/opencv_contrib.git
+RUN cd ~/opencv && \
+    mkdir build && \
+    cd build && \
+    cmake -D CMAKE_BUILD_TYPE=RELEASE \
+        -D CMAKE_INSTALL_PREFIX=/usr/local \
+        -D WITH_GSTREAMER=ON \
+        -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
+        -D BUILD_opencv_python2=OFF \
+        -D BUILD_opencv_python3=ON \
+        -D PYTHON_VERSION=310 \
+        -D PYTHON3_EXECUTABLE=$(which python3) \
+        -D BUILD_opencv_python3=ON \
+        -D BUILD_EXAMPLES=OFF .. && \
+    make -j$(nproc) && \
+    sudo make install && \
+    sudo ldconfig
 
 # Back to root
 USER root
@@ -110,19 +139,27 @@ RUN wget https://raw.githubusercontent.com/mavlink/mavros/ros2/mavros/scripts/in
 # Note that the GPU versions take a lot more space ~4GB
 # You will also have to enable gpu in docker-compose.yml (and have drivers on host machine)
 
+# Use pip install only when necessary, prefer apt.
+# This should probably be installed in a venv to not conflict with dist packages.
 RUN python3 -m pip install \
     torch torchvision torchaudio \
     --index-url https://download.pytorch.org/whl/cpu
     # --index-url https://download.pytorch.org/whl/cu128
     # --index-url https://download.pytorch.org/whl/rocm6.3
 RUN python3 -m pip install \
-    opencv-python \
     ultralytics
+# Uninstall numpy from global pip to use apt numpy, better to use a venv or build opencv with numpy v2.x.x
+RUN python3 -m pip uninstall -y numpy
+USER ${USERNAME}
+RUN python3 -m pip uninstall -y numpy
+USER root
 
 # Place new packages here or ones not needed in any build dependencies
 RUN apt-get install -y --no-install-recommends \
     x11-apps \
-    dos2unix
+    dos2unix \
+    python3-colcon-clean
+# Use `pip install` only when necessary, prefer apt or a venv
 # RUN python3 -m pip install --ignore-installed \
 #     colorama \
 #     pydot \
@@ -135,7 +172,7 @@ RUN apt-get install -y --no-install-recommends \
 
 USER $USERNAME
 
-# Append setup to .bashrc
+# Append ROS setup to .bashrc
 RUN echo "" >> ~/.bashrc && \
     echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc && \
     echo "source /home/uas/workspace/uas_ws/install/local_setup.bash" >> ~/.bashrc && \
