@@ -157,7 +157,8 @@ USER root
 # Place new packages here or ones not needed in any build dependencies
 RUN apt-get install -y --no-install-recommends \
     x11-apps \
-    dos2unix
+    dos2unix \
+    python3-colcon-clean
 # Use `pip install` only when necessary, prefer apt or a venv
 # RUN python3 -m pip install --ignore-installed \
 #     colorama \
@@ -171,7 +172,7 @@ RUN apt-get install -y --no-install-recommends \
 
 USER $USERNAME
 
-# Append setup to .bashrc
+# Append ROS setup to .bashrc
 RUN echo "" >> ~/.bashrc && \
     echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc && \
     echo "source /home/uas/workspace/uas_ws/install/local_setup.bash" >> ~/.bashrc && \
