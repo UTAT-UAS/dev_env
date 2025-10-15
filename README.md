@@ -59,7 +59,7 @@ See [Virtual Desktop](#virtual-desktop) for enabling a browser accessible deskto
 8. From `/home/uas/workspace` Run `vcs import < ./repos/latest.repos`
     - If new repositories do not appear in VScode source control, from command palette run `Developer: Reload Window` to refresh.
     - If new repositories are still not visible on the source control tab click the `...` then `View & Sort` > `repositories` and check the ones you want to see. Alternatively under `Views` enable `Source Control Repositories` for an alternate layout.
-9. Once in the container run `cd uas_ws` and run `colcon build`.
+9. Once in the container run `cd uas_ws` and run `colcon build --symlink-install`.
 10. Read each repositories `README.md` for more information on working with them.
 
 ## vcstool
