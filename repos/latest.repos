@@ -15,6 +15,10 @@ repositories:
     type: git
     url: git@github.com:UTAT-UAS/computer_vision.git
     version: main
+  ./flight_visualizer:
+    type: git
+    url: git@github.com:UTAT-UAS/flight_visualizer.git
+    version: main
   uas_ws/src/px4_msgs:
     type: git
     url: https://github.com/PX4/px4_msgs.git

@@ -91,6 +91,7 @@ RUN git clone --branch v2.4.2 https://github.com/eProsima/Micro-XRCE-DDS-Agent.g
 
 # Build OpenCV with gstreamer support (needed for gazebo camera plugin video capture)
 # https://medium.com/@erencanbulut/step-by-step-build-opencv-with-gstreamer-on-jetson-orin-nano-ubuntu-22-04-08edfb373c78
+# TODO build with numpy v2.x.x
 RUN sudo apt install -y \
     build-essential cmake git pkg-config \
     libjpeg-dev libtiff-dev libpng-dev \
@@ -105,18 +106,61 @@ RUN cd ~/opencv && \
     mkdir build && \
     cd build && \
     cmake -D CMAKE_BUILD_TYPE=RELEASE \
-        -D CMAKE_INSTALL_PREFIX=/usr/local \
-        -D WITH_GSTREAMER=ON \
-        -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
-        -D BUILD_opencv_python2=OFF \
-        -D BUILD_opencv_python3=ON \
-        -D PYTHON_VERSION=310 \
-        -D PYTHON3_EXECUTABLE=$(which python3) \
-        -D BUILD_opencv_python3=ON \
-        -D BUILD_EXAMPLES=OFF .. && \
+    -D CMAKE_INSTALL_PREFIX=/usr/local \
+    -D WITH_GSTREAMER=ON \
+    -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
+    -D BUILD_opencv_python2=OFF \
+    -D BUILD_opencv_python3=ON \
+    -D PYTHON_VERSION=310 \
+    -D PYTHON3_EXECUTABLE=$(which python3) \
+    -D BUILD_EXAMPLES=OFF .. && \
     make -j$(nproc) && \
     sudo make install && \
     sudo ldconfig
+
+RUN sudo pip install meson
+RUN git clone --depth 1 -b 1.26 https://gitlab.freedesktop.org/gstreamer/gstreamer.git
+RUN cd gstreamer && \
+    meson setup builddir -Dgpl=enabled && \
+    meson compile -C builddir && \
+    yes | meson install -C builddir
+RUN sudo ldconfig
+
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash && \
+    \. "$HOME/.nvm/nvm.sh" && \
+    nvm install 22
+
+RUN git clone --depth 1 -b gstreamer-1.26.7 https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs.git
+RUN cd gst-plugins-rs/net/webrtc && \
+    cargo build && \
+    cd gstwebtrc-api && \
+    npm install && \
+    npm run build
+
+# Webserver dependencies
+RUN sudo apt install ros-humble-rosbridge-server
+RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash -
+RUN pnpm config set store-dir ~/.local/share/pnpm/store
+
+# Computer vision Python packages
+
+# https://pytorch.org/get-started/locally/
+# Change (or remove) --index-url to use a different compute platform (make sure to use the correct cu/rocm version for you GPU)
+# Note that the GPU versions take a lot more space ~4GB
+# You will also have to enable gpu in docker-compose.yml (and have drivers on host machine)
+# We probably shouldn't be using pip or sudo pip but it works so...
+RUN python3 -m pip install \
+    torch torchvision torchaudio \
+    --index-url https://download.pytorch.org/whl/cpu
+    # --index-url https://download.pytorch.org/whl/cu128
+    # --index-url https://download.pytorch.org/whl/rocm6.3
+# Install ultralytics
+RUN python3 -m pip install \
+    ultralytics
+# Uninstall numpy for apt managed (for opencv), and remove opencv to use the one we built
+RUN python3 -m pip uninstall numpy && \
+    python3 -m pip uninstall opencv-python
 
 # Back to root
 USER root
@@ -132,51 +176,20 @@ RUN apt-get install -y --no-install-recommends \
 RUN wget https://raw.githubusercontent.com/mavlink/mavros/ros2/mavros/scripts/install_geographiclib_datasets.sh && \
     bash ./install_geographiclib_datasets.sh
 
-# Computer vision Python packages
-
-# https://pytorch.org/get-started/locally/
-# Change (or remove) --index-url to use a different compute platform (make sure to use the correct cu/rocm version for you GPU)
-# Note that the GPU versions take a lot more space ~4GB
-# You will also have to enable gpu in docker-compose.yml (and have drivers on host machine)
-
-# Use pip install only when necessary, prefer apt.
-# This should probably be installed in a venv to not conflict with dist packages.
-RUN python3 -m pip install \
-    torch torchvision torchaudio \
-    --index-url https://download.pytorch.org/whl/cpu
-    # --index-url https://download.pytorch.org/whl/cu128
-    # --index-url https://download.pytorch.org/whl/rocm6.3
-RUN python3 -m pip install \
-    ultralytics
-# Uninstall numpy from global pip to use apt numpy, better to use a venv or build opencv with numpy v2.x.x
-RUN python3 -m pip uninstall -y numpy
-USER ${USERNAME}
-RUN python3 -m pip uninstall -y numpy
-USER root
-
 # Place new packages here or ones not needed in any build dependencies
 RUN apt-get install -y --no-install-recommends \
     x11-apps \
     dos2unix \
     python3-colcon-clean
-# Use `pip install` only when necessary, prefer apt or a venv
-# RUN python3 -m pip install --ignore-installed \
-#     colorama \
-#     pydot \
-#     pygeodesy \
-#     pyserial \
-#     types-colorama \
-#     flask-socketio \
-#     flask_cors \
-#     pykml
 
 USER $USERNAME
 
-# Append ROS setup to .bashrc
+# Append ROS and PATH setup to .bashrc
 RUN echo "" >> ~/.bashrc && \
     echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc && \
     echo "source /home/uas/workspace/uas_ws/install/local_setup.bash" >> ~/.bashrc && \
     echo "source /usr/share/colcon_cd/function/colcon_cd.sh" >> ~/.bashrc && \
     echo "export _colcon_cd_root=/opt/ros/humble/" >> ~/.bashrc && \
     echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> ~/.bashrc && \
+    echo 'export GST_PLUGIN_PATH="/home/uas/gst-plugins-rs/target/debug:$$GST_PLUGIN_PATH"' && \
     echo "" >> ~/.bashrc
