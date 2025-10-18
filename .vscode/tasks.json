@@ -6,7 +6,8 @@
         {
             "label": "px4_sitl",
             "type": "shell",
-            "command": "cd ~/PX4-Autopilot && make px4_sitl gz_x500",
+            // "command": "cd ~/PX4-Autopilot && make px4_sitl gz_x500_mono_cam_down",
+            "command": "export PX4_GZ_WORLD=landing_pad && cd ~/PX4-Autopilot && make px4_sitl gz_x500_mono_cam_down",
             "presentation": {
                 "reveal": "always",
                 "panel": "new",

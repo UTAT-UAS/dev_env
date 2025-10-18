@@ -1,0 +1,49 @@
+https://gstreamer.freedesktop.org/documentation/installing/building-from-source-using-cerbero.html?gi-language=c
+
+sudo apt install python3.10-venv
+sudo apt install python3-cairo-dev
+
+# actual
+
+
+https://gitlab.freedesktop.org/gstreamer/gstreamer/-/blob/main/README.md#user-content-optional-installation
+https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs/-/tree/main/net/webrtc
+
+https://github.com/PX4/PX4-Autopilot/blob/main/src/modules/simulation/gz_plugins/gstreamer/README.md
+https://stackoverflow.com/questions/58067669/sending-udp-stream-gstreamer
+
+
+https://gstreamer.freedesktop.org/documentation/installing/on-linux.html?gi-language=c
+
+# steps
+
+sudo pip install meson
+git clone --depth 1 -b 1.26 https://gitlab.freedesktop.org/gstreamer/gstreamer.git
+cd gstreamer
+meson setup builddir -Dgpl=enabled
+meson compile -C builddir
+yes | meson install -C builddir
+
+sudo ldconfig
+
+
+# Don't have to pin to a rust version?
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+\. "$HOME/.nvm/nvm.sh"
+nvm install 22
+
+git clone --depth 1 -b gstreamer-1.26.7 https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs.git
+cs gst-plugins-rs/net/webrtc
+cargo build
+
+cd gstwebtrc-api
+npm install
+npm run build
+
+export GST_PLUGIN_PATH="/home/uas/gst-plugins-rs/target/debug:$GST_PLUGIN_PATH"
+
+# other things
+sudo apt install ros-humble-rosbridge-server
+wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash -
