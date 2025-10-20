@@ -118,30 +118,34 @@ RUN cd ~/opencv && \
     sudo make install && \
     sudo ldconfig
 
+# Build gstreamer from source to get a more recent version for rust plugins
 RUN sudo pip install meson
 RUN git clone --depth 1 -b 1.26 https://gitlab.freedesktop.org/gstreamer/gstreamer.git
 RUN cd gstreamer && \
-    meson setup builddir -Dgpl=enabled && \
-    meson compile -C builddir && \
-    yes | meson install -C builddir
+    meson setup builddir -Dgpl=enabled
+RUN cd gstreamer && \
+    meson compile -C builddir
+RUN cd gstreamer && \
+    yes | sudo meson install -C builddir
 RUN sudo ldconfig
 
+# Install rust and node
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash && \
-    \. "$HOME/.nvm/nvm.sh" && \
-    nvm install 22
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && \
+    sudo apt-get install -y --no-install-recommends nodejs
 
+# Build and install gsrtreamer rust plugins for webrtc
 RUN git clone --depth 1 -b gstreamer-1.26.7 https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs.git
-RUN cd gst-plugins-rs/net/webrtc && \
+RUN bash -lc "source ~/.bashrc && \
+    cd gst-plugins-rs/net/webrtc && \
     cargo build && \
-    cd gstwebtrc-api && \
+    cd gstwebrtc-api && \
     npm install && \
-    npm run build
+    npm run build"
 
 # Webserver dependencies
-RUN sudo apt install ros-humble-rosbridge-server
+RUN sudo apt install -y ros-humble-rosbridge-server
 RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash -
-RUN pnpm config set store-dir ~/.local/share/pnpm/store
 
 # Computer vision Python packages
 
@@ -159,8 +163,8 @@ RUN python3 -m pip install \
 RUN python3 -m pip install \
     ultralytics
 # Uninstall numpy for apt managed (for opencv), and remove opencv to use the one we built
-RUN python3 -m pip uninstall numpy && \
-    python3 -m pip uninstall opencv-python
+RUN python3 -m pip uninstall -y numpy && \
+    python3 -m pip uninstall -y opencv-python
 
 # Back to root
 USER root
