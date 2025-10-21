@@ -24,6 +24,7 @@ services:
       - ../:/home/uas/workspace
       - /tmp/.X11-unix:/tmp/.X11-unix
       # - /dev/input:/dev/input
+      # - /dev:/dev
     command: /bin/bash
     # network_mode: host
     # deploy:

@@ -6,7 +6,7 @@
         {
             "label": "px4_sitl",
             "type": "shell",
-            "command": "cd ~/PX4-Autopilot && make px4_sitl gz_x500",
+            "command": "cd /build/PX4-Autopilot && make px4_sitl gz_x500_mono_cam",
             "presentation": {
                 "reveal": "always",
                 "panel": "new",

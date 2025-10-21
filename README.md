@@ -7,8 +7,19 @@ A batteries-included opinionated environment for UAS Multirotor PX4/ROS2 project
 - Includes ROS2 Humble, PX4 16.0, uXRCE-DDS, and other development tools/dependencies
 - VSCode configuration pre-configured (generic editor documentation coming soon)
 - QGroundControl bundled in the system path with `qgc`
+- OpenCV with gstreamer support
+- gstreamer webrtc support
 
 [See here for the full walkthrough](https://utat-uas.github.io/wiki/Multirotor/Tutorials/)
+
+## Container Layout
+
+```cs
+/build
+├── PX4-Autopilot/  // PX4 repository location
+└── lib/            // Extra libraries
+/home/uas/workspace // Where this dir is mounted as a volume
+```
 
 ## Repository Layout
 
