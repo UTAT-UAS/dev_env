@@ -1,11 +1,6 @@
 services:
   uas:
-    image: uas/dev-environment:local
-    build:
-      context: ..
-      dockerfile: .devcontainer/Dockerfile
-      tags:
-        - uas/dev-environment:local
+    image: ghcr.io/utat-uas/dev_env:latest
     hostname: ros-dev
     extra_hosts:
       - "localhost localhost.localdomain ros-dev:127.0.0.1"

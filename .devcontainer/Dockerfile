@@ -184,3 +184,5 @@ RUN echo "" >> ~/.bashrc && \
     echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> ~/.bashrc && \
     echo 'export GST_PLUGIN_PATH="/build/lib/x86_64-linux-gnu/gstreamer-1.0:$GST_PLUGIN_PATH"' >> ~/.bashrc && \
     echo "" >> ~/.bashrc
+
+LABEL org.opencontainers.image.source=https://github.com/UTAT-UAS/dev_env

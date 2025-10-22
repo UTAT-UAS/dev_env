@@ -61,10 +61,8 @@ See [Virtual Desktop](#virtual-desktop) for enabling a browser accessible deskto
 2. Take the time now to [enable GPU passthrough](#gpu) for Gazebo and Computer Vision tasks.
 3. You should be prompted by a pop-up in the bottom right to open this folder in a container.
     - If not, open command palette `ctrl+shift+p` and search for `Dev Containers: Open Folder in Container`.
-4. VScode should begin building the container
-    - On a fast PC with fast internet this takes about 15 minutes
-    - On a slow PC with slow internet this could take 30++ minutes
-5. Test that your setup works by running the `sim` command
+4. VScode should now pull the container from `ghcr.io` and run some setup commands
+5. Test that your setup works by running the `Launch Simulator` task
 6. For version control GitHub via `SSH` is required: [GitHub docs](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
 7. Enable `ssh-agent` [passthrough](https://code.visualstudio.com/remote/advancedcontainers/sharing-git-credentials) for devcontainers.
 8. From `/home/uas/workspace` Run `vcs import < ./repos/latest.repos`
