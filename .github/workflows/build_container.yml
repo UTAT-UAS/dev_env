@@ -23,11 +23,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: set repository to lowercase for image tag
+        run: |
+          echo "IMAGE_NAME=${REPO,,}" >>${GITHUB_ENV}
+        env:
+          REPO: '${{ github.repository }}'
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./.devcontainer
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/${ IMAGE_NAME }:latest
+            ghcr.io/${ IMAGE_NAME }:${{ github.sha }}
