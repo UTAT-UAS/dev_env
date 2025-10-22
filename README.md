@@ -48,10 +48,10 @@ OS Support:
 
 *Gazebo seems unable to use integrated GPUs however, and dedicated GPU setup has not been tested
 
-Recommended at least ~15GB of free space (more is better).
-- Container is about ~12GB (it takes a lot of packages to run this stuff).
-- Extra 3GB for the container storage, files, caching, logs, etc.
-- With GPU accelerated PyTorch ~25GB of free space is required
+Recommended at least ~30GB of free space (more is better).
+- Container is about ~23GB (it takes a lot of packages to run this stuff).
+- Extra 2GB for the container storage, files, caching, logs, etc.
+- ~5GB for build artifacts, cache, etc.
 
 Assuming you have Docker and VSCode already installed. (For Windows Docker should be installed via WSL in order for X11 apps to work) (For Linux rootless Docker will not work as the workspace ownership will be weird)
 
@@ -105,6 +105,8 @@ A GPU is highly recommend for Computer Vision tasks. It is also nice to have for
 
 Setup will vary widely between OS and hardware configurations, it is likely best you consult external sources for your specific configuration.
 
+For pytorch change which version gets install in `.devcontainer/on-create.sh`
+
 ### Nvidia
 
 Windows/WSL2:
@@ -138,6 +140,16 @@ TODO DOCUMENTATION NEEDED
 Linux: If it works on the host it should just work
 
 Windows/WSL2: Seems to be unsupported for Gazebo
+
+## Building the image
+
+To build the image from scratch you can run:
+
+```sh
+docker build dev_env:local .devcontainer
+```
+
+Change the image in `./devcontainer/docker-compose.yml`
 
 ## Virtual Desktop
 
