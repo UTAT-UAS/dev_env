@@ -4,6 +4,7 @@ on:
   push:
     branches: ['main']
     paths: ['.devcontainer/Dockerfile']
+  workflow_dispatch:
 
 jobs:
   build-and-push:
@@ -35,5 +36,5 @@ jobs:
           context: ./.devcontainer
           push: true
           tags: |
-            ghcr.io/${ IMAGE_NAME }:latest
-            ghcr.io/${ IMAGE_NAME }:${{ github.sha }}
+            ghcr.io/${{ env.IMAGE_NAME }}:latest
+            ghcr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
