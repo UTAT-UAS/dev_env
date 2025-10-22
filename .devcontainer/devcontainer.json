@@ -5,8 +5,9 @@
 	"containerUser": "uas",
 	"workspaceFolder": "/home/uas/workspace",
 	"shutdownAction": "stopCompose",
-	"postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
+	"onCreateCommand": "bash .devcontainer/on-create.sh",
 	"postCreateCommand": "bash .devcontainer/post-create.sh",
+	"postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
 	"forwardPorts": [
 		5000,
 		8080,
@@ -46,7 +47,7 @@
 				"njpwerner.autodocstring",
 				// "ms-python.mypy-type-checker",
 				"eamodio.gitlens",
-				// "svelte.svelte-vscode"
+				"svelte.svelte-vscode"
 			]
 		}
 	},

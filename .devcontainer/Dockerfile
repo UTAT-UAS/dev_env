@@ -67,12 +67,14 @@ RUN echo "/QGroundControl-x86_64.AppImage --appimage-extract-and-run" >> /usr/bi
 RUN chmod +x "/QGroundControl-x86_64.AppImage"
 RUN chmod +x "/usr/bin/qgc"
 
-# Do as USER
-USER $USERNAME
-WORKDIR /home/$USERNAME
+# Build custom packages as root in /build
+RUN mkdir /build
+RUN chmod 777 /build
+WORKDIR /build
 
-# Install PX4
-RUN git clone --branch v1.16.0 https://github.com/PX4/PX4-Autopilot.git --recursive && \
+# Install PX4, umask because we want to edit/build as user later
+RUN umask 000 && \
+    git clone --branch v1.16.0 https://github.com/PX4/PX4-Autopilot.git --recursive && \
     bash ./PX4-Autopilot/Tools/setup/ubuntu.sh && \
     cd PX4-Autopilot && \
     DONT_RUN=1 make px4_sitl
@@ -88,6 +90,7 @@ RUN git clone --branch v2.4.2 https://github.com/eProsima/Micro-XRCE-DDS-Agent.g
     make -j$(nproc) && \
     sudo make install && \
     sudo ldconfig /usr/local/lib/
+RUN sudo rm -r Micro-XRCE-DDS-Agent
 
 # Build OpenCV with gstreamer support (needed for gazebo camera plugin video capture)
 # https://medium.com/@erencanbulut/step-by-step-build-opencv-with-gstreamer-on-jetson-orin-nano-ubuntu-22-04-08edfb373c78
@@ -102,7 +105,7 @@ RUN sudo apt install -y \
     libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
 RUN git clone --branch 4.12.0 --depth 1 https://github.com/opencv/opencv.git && \
     git clone --branch 4.12.0 --depth 1 https://github.com/opencv/opencv_contrib.git
-RUN cd ~/opencv && \
+RUN cd opencv && \
     mkdir build && \
     cd build && \
     cmake -D CMAKE_BUILD_TYPE=RELEASE \
@@ -117,8 +120,10 @@ RUN cd ~/opencv && \
     make -j$(nproc) && \
     sudo make install && \
     sudo ldconfig
+RUN sudo rm -r opencv
+RUN sudo rm -r opencv_contrib
 
-# Build gstreamer from source to get a more recent version for rust plugins
+# Build gstreamer from source to get a version > 1.22 to build rust plugins
 RUN sudo pip install meson
 RUN git clone --depth 1 -b 1.26 https://gitlab.freedesktop.org/gstreamer/gstreamer.git
 RUN cd gstreamer && \
@@ -128,47 +133,24 @@ RUN cd gstreamer && \
 RUN cd gstreamer && \
     yes | sudo meson install -C builddir
 RUN sudo ldconfig
+RUN sudo rm -r gstreamer
 
-# Install rust and node
+# Temporarily install rust as root
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && \
-    sudo apt-get install -y --no-install-recommends nodejs
 
-# Build and install gsrtreamer rust plugins for webrtc
-RUN git clone --depth 1 -b gstreamer-1.26.7 https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs.git
-RUN bash -lc "source ~/.bashrc && \
-    cd gst-plugins-rs/net/webrtc && \
-    cargo build && \
-    cd gstwebrtc-api && \
-    npm install && \
-    npm run build"
-
-# Webserver dependencies
-RUN sudo apt install -y ros-humble-rosbridge-server
-RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash -
-
-# Computer vision Python packages
-
-# https://pytorch.org/get-started/locally/
-# Change (or remove) --index-url to use a different compute platform (make sure to use the correct cu/rocm version for you GPU)
-# Note that the GPU versions take a lot more space ~4GB
-# You will also have to enable gpu in docker-compose.yml (and have drivers on host machine)
-# We probably shouldn't be using pip or sudo pip but it works so...
-RUN python3 -m pip install \
-    torch torchvision torchaudio \
-    --index-url https://download.pytorch.org/whl/cpu
-    # --index-url https://download.pytorch.org/whl/cu128
-    # --index-url https://download.pytorch.org/whl/rocm6.3
-# Install ultralytics
-RUN python3 -m pip install \
-    ultralytics
-# Uninstall numpy for apt managed (for opencv), and remove opencv to use the one we built
-RUN python3 -m pip uninstall -y numpy && \
-    python3 -m pip uninstall -y opencv-python
-
-# Back to root
-USER root
-WORKDIR /
+# Build and install gstreamer rust plugins for webrtc
+RUN git clone --depth 1 -b gstreamer-1.26.7 https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs.git && \
+    cd gst-plugins-rs && \
+    . "$HOME/.cargo/env" && \
+    cargo install cargo-c && \
+    cargo cinstall -p gst-plugin-webrtc --prefix=/build && \
+    cd net/webrtc/signalling && \
+    cargo build --release
+RUN cp gst-plugins-rs/target/release/gst-webrtc-signalling-server /usr/bin
+# Remove rust as root
+RUN rm -r gst-plugins-rs && \
+    . "$HOME/.cargo/env" && \
+    rustup self uninstall -y
 
 # Install Mavros/Mavlink (binary installation)
 RUN apt-get install -y --no-install-recommends \
@@ -176,17 +158,22 @@ RUN apt-get install -y --no-install-recommends \
     ros-${ROS_DISTRO}-mavros-extras \
     ros-${ROS_DISTRO}-mavros-msgs
 
-# geographiclib datsets installation
-RUN wget https://raw.githubusercontent.com/mavlink/mavros/ros2/mavros/scripts/install_geographiclib_datasets.sh && \
-    bash ./install_geographiclib_datasets.sh
+# geographiclib dataset installation
+RUN wget -qO- https://raw.githubusercontent.com/mavlink/mavros/ros2/mavros/scripts/install_geographiclib_datasets.sh | bash -
+
+# Node 22
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && \
+    apt-get install -y --no-install-recommends nodejs
 
 # Place new packages here or ones not needed in any build dependencies
 RUN apt-get install -y --no-install-recommends \
     x11-apps \
     dos2unix \
+    ros-humble-rosbridge-server \
     python3-colcon-clean
 
 USER $USERNAME
+# WORKDIR /home/$USERNAME
 
 # Append ROS and PATH setup to .bashrc
 RUN echo "" >> ~/.bashrc && \
@@ -195,5 +182,5 @@ RUN echo "" >> ~/.bashrc && \
     echo "source /usr/share/colcon_cd/function/colcon_cd.sh" >> ~/.bashrc && \
     echo "export _colcon_cd_root=/opt/ros/humble/" >> ~/.bashrc && \
     echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> ~/.bashrc && \
-    echo 'export GST_PLUGIN_PATH="/home/uas/gst-plugins-rs/target/debug:$$GST_PLUGIN_PATH"' && \
+    echo 'export GST_PLUGIN_PATH="/build/lib/x86_64-linux-gnu/gstreamer-1.0:$GST_PLUGIN_PATH"' >> ~/.bashrc && \
     echo "" >> ~/.bashrc
