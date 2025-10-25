@@ -169,6 +169,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && \
 RUN apt-get install -y --no-install-recommends \
     x11-apps \
     dos2unix \
+    tmuxinator \
     ros-humble-rosbridge-server \
     python3-colcon-clean
 

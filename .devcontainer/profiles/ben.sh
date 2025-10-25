@@ -24,3 +24,6 @@ tar -xvf zellij-x86_64-unknown-linux-musl.tar.gz
 chmod +x zellij
 echo "" >> ~/.bashrc
 echo "export PATH=\$PATH:$(pwd)" >> ~/.bashrc
+
+zellij setup --generate-completion bash > ~/.zellij_completion.bash
+echo "source ~/.zellij_completion.bash" >> ~/.bashrc
