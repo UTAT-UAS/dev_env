@@ -42,3 +42,11 @@ python3 -m pip install \
 # Uninstall numpy for apt managed (for opencv), and remove opencv to use the one we built
 python3 -m pip uninstall -y numpy
 python3 -m pip uninstall -y opencv-python
+
+# If you have a newer GPU, install more modern mesa drivers
+# You might have to pass the device in through the docker-compose.yml as well
+
+# sudo apt install software-properties-common
+# sudo add-apt-repository ppa:kisak/turtle
+# sudo apt update
+# sudo apt install --only-upgrade libdrm-amdgpu1 libdrm-common libdrm-dev libdrm-intel1 libdrm-nouveau2 libdrm-radeon1 libdrm2 libegl-mesa0 libegl1-mesa-dev libgbm-dev libgbm1 libgl1-mesa-dev libgl1-mesa-dri libglx-mesa0 libllvm15 libvdpau1
